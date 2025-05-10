@@ -3,14 +3,16 @@ package br.com.wayon.agendatransferencia.dto.request;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Getter
 @Setter
 public class TransferenciaRequestDTO {
 
-    private Integer contaOrigem;
-    private Integer contaDestino;
-    private LocalDateTime dataAgendamento;
+    private String contaOrigem;
+    private String contaDestino;
+    private BigDecimal valor;
+    private LocalDate dataTransferencia;
 
 }

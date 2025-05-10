@@ -22,21 +22,17 @@ public class TransferenciaService {
         this.taxaRepository = taxaRepository;
     }
 
-    public Transferencia agendarTransferencia(Transferencia transferencia) {
-        long dias = ChronoUnit.DAYS.between(LocalDate.now(), transferencia.getDataTransferencia());
+    public Transferencia scheduleTransfer(Transferencia transfer) {
+        long dias = ChronoUnit.DAYS.between(LocalDate.now(), transfer.getDataTransferencia());
 
-        Taxa taxa = taxaRepository
-                .findByDiasDeLessThanEqualAndDiasAteGreaterThanEqual((int) dias, (int) dias)
-                .orElseThrow(() -> new IllegalArgumentException("Nenhuma taxa aplicável encontrada para " + dias + " dias."));
+        Taxa taxa = taxaRepository.findByDiasDeLessThanEqualAndDiasAteGreaterThanEqual((int) dias, (int) dias)
+                .orElseThrow(() -> new IllegalArgumentException("Nenhuma taxa aplicável encontrada para o intervalo de dias: " + dias));
 
-        BigDecimal valorTaxa = taxa.getTaxaFixa()
-                .add(transferencia.getValor()
-                        .multiply(taxa.getTaxaPercentual().divide(BigDecimal.valueOf(100))));
+        BigDecimal taxaCalculada = taxa.getTaxaFixa().add(transfer.getAmount().multiply(taxa.getTaxaPercentual().divide(BigDecimal.valueOf(100))));
+        transfer.set(taxaCalculada);
+        transfer.setDataAgendamento(LocalDate.now());
 
-        transferencia.setTaxa(valorTaxa);
-        transferencia.setDataAgendamento(LocalDate.now());
-
-        return transferenciaRepository.save(transferencia);
+        return transferRepository.save(transfer);
     }
 
     public List<Transferencia> listarTodas() {
